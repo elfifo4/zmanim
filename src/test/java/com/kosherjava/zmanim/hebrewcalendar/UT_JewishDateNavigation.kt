@@ -10,6 +10,7 @@ import org.junit.Test
  *
  */
 class UT_JewishDateNavigation {
+
     @Test
     fun jewishForwardMonthToMonth() {
         val jewishDate = JewishDate()
@@ -29,4 +30,5 @@ class UT_JewishDateNavigation {
         Assert.assertEquals(8, jewishDate.gregorianMonth.toLong())
         Assert.assertEquals(2010, jewishDate.gregorianYear.toLong())
     }
+
 } // End of UT_JewishDateNavigation class

@@ -4,6 +4,7 @@ import org.junit.Assert
 import org.junit.Test
 
 class UT_YerushalmiTest {
+
     @Test
     fun testCorrectDaf1() {
         val jewishCalendar = JewishCalendar(5777, JewishCalendar.ELUL, 10)
@@ -48,4 +49,5 @@ class UT_YerushalmiTest {
             hdf.isHebrewFormat = true
         }
     }
+
 }

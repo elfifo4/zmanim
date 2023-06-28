@@ -12,6 +12,7 @@ import java.util.Calendar
  * has 28 or 29 days...
  */
 class UT_DaysInGregorianMonth {
+
     @Test
     fun testDaysInMonth() {
         val hebrewDate = JewishDate()
@@ -54,7 +55,7 @@ class UT_DaysInGregorianMonth {
 
     private fun assertDaysInMonth(
         febIsLeap: Boolean,
-        hebrewDate: JewishDate
+        hebrewDate: JewishDate,
     ) {
         Assert.assertEquals(31, hebrewDate.getLastDayOfGregorianMonth(1).toLong())
         Assert.assertEquals((if (febIsLeap) 29 else 28).toLong(), hebrewDate.getLastDayOfGregorianMonth(2).toLong())
@@ -69,4 +70,5 @@ class UT_DaysInGregorianMonth {
         Assert.assertEquals(30, hebrewDate.getLastDayOfGregorianMonth(11).toLong())
         Assert.assertEquals(31, hebrewDate.getLastDayOfGregorianMonth(12).toLong())
     }
+
 } // End of UT_DaysInGregorianMonth class

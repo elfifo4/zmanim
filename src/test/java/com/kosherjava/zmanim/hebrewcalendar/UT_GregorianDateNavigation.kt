@@ -11,6 +11,7 @@ import java.util.Calendar
  * Checks that we can roll forward & backward the gregorian dates...
  */
 class UT_GregorianDateNavigation {
+
     @Test
     fun gregorianForwardMonthToMonth() {
         val cal = Calendar.getInstance()
@@ -226,4 +227,5 @@ class UT_GregorianDateNavigation {
         Assert.assertEquals(11, hebrewDate.jewishMonth.toLong())
         Assert.assertEquals(16, hebrewDate.jewishDayOfMonth.toLong())
     }
+
 } // End of UT_GregorianDateNavigation class

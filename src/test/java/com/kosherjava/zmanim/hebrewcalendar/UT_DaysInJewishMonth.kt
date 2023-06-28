@@ -10,6 +10,7 @@ import org.junit.Test
  * Validate the days in a Hebrew month (in various types of years) are correct.
  */
 class UT_DaysInJewishMonth {
+
     @Test
     fun daysInMonthsInHaserYear() {
         assertHaser(5773)
@@ -89,4 +90,5 @@ class UT_DaysInJewishMonth {
         assertShalem(year)
         Assert.assertTrue(jewishDate.isJewishLeapYear)
     }
+
 } // End of UT_DaysInJewishMonth class
