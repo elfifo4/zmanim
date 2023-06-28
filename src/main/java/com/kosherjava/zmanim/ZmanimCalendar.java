@@ -366,7 +366,7 @@ public class ZmanimCalendar extends AstronomicalCalendar {
 	 * @see #setCandleLightingOffset(double)
 	 */
 	public Date getCandleLighting() {
-		return getTimeOffset(getSeaLevelSunset(), -getCandleLightingOffset() * MINUTE_MILLIS);
+		return getTimeOffset(getSeaLevelSunset(), (long) (-getCandleLightingOffset() * MINUTE_MILLIS));
 	}
 
 	/**
@@ -759,6 +759,6 @@ public class ZmanimCalendar extends AstronomicalCalendar {
 	 */
 	public Date getShaahZmanisBasedZman(Date startOfDay, Date endOfDay, double hours) {
 		long shaahZmanis = getTemporalHour(startOfDay, endOfDay);
-		return getTimeOffset(startOfDay, shaahZmanis * hours);
+		return getTimeOffset(startOfDay, (long) (shaahZmanis * hours));
 	}
 }

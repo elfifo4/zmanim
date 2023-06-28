@@ -1902,7 +1902,7 @@ public class ComplexZmanimCalendar extends ZmanimCalendar {
 	 * @see #getPlagAhavatShalom()
 	 */
 	public Date getMinchaKetanaAhavatShalom() {
-		return getTimeOffset(getTzaisGeonim3Point8Degrees(), -getShaahZmanisAlos16Point1ToTzais3Point8() * 2.5);
+		return getTimeOffset(getTzaisGeonim3Point8Degrees(), (long) (-getShaahZmanisAlos16Point1ToTzais3Point8() * 2.5));
 	}
 
 	/**
@@ -2235,7 +2235,7 @@ public class ComplexZmanimCalendar extends ZmanimCalendar {
 	 * @see #getMinchaKetanaAhavatShalom()
 	 */
 	public Date getPlagAhavatShalom() {
-		return getTimeOffset(getTzaisGeonim3Point8Degrees(), -getShaahZmanisAlos16Point1ToTzais3Point8() * 1.25);
+		return getTimeOffset(getTzaisGeonim3Point8Degrees(), (long) (-getShaahZmanisAlos16Point1ToTzais3Point8() * 1.25));
 	}
 
 	/**
@@ -2288,7 +2288,7 @@ public class ComplexZmanimCalendar extends ZmanimCalendar {
 	 * 
 	 */
 	public Date getBainHashmashosRT58Point5Minutes() {
-		return getTimeOffset(getElevationAdjustedSunset(), 58.5 * MINUTE_MILLIS);
+		return getTimeOffset(getElevationAdjustedSunset(), (long) (58.5 * MINUTE_MILLIS));
 	}
 	
 	/**
@@ -2312,7 +2312,7 @@ public class ComplexZmanimCalendar extends ZmanimCalendar {
 	 * @see #getTzaisGeonim7Point083Degrees()
 	 */
 	public Date getBainHashmashosRT13Point5MinutesBefore7Point083Degrees() {
-		return getTimeOffset(getSunsetOffsetByDegrees(ZENITH_7_POINT_083), -13.5 * MINUTE_MILLIS);
+		return getTimeOffset(getSunsetOffsetByDegrees(ZENITH_7_POINT_083), (long) (-13.5 * MINUTE_MILLIS));
 	}
 	
 	/**
@@ -2342,7 +2342,7 @@ public class ComplexZmanimCalendar extends ZmanimCalendar {
 		if (alos19Point8 == null || sunrise == null) {
 			return null;
 		}
-		return getTimeOffset(getElevationAdjustedSunset(), (sunrise.getTime() - alos19Point8.getTime()) * (5 / 18d));
+		return getTimeOffset(getElevationAdjustedSunset(), (long) ((sunrise.getTime() - alos19Point8.getTime()) * (5 / 18d)));
 	}
 	
 	/**
@@ -2436,7 +2436,7 @@ public class ComplexZmanimCalendar extends ZmanimCalendar {
 	 * @see #getBainHashmashosYereim2Point8Degrees()
 	 */
 	public Date getBainHashmashosYereim16Point875Minutes() {
-		return getTimeOffset(getElevationAdjustedSunset(), -16.875 * MINUTE_MILLIS);
+		return getTimeOffset(getElevationAdjustedSunset(), (long) (-16.875 * MINUTE_MILLIS));
 	}
 	
 	/**
@@ -2496,7 +2496,7 @@ public class ComplexZmanimCalendar extends ZmanimCalendar {
 	 * @see #getBainHashmashosYereim2Point1Degrees()
 	 */
 	public Date getBainHashmashosYereim13Point5Minutes() {
-		return getTimeOffset(getElevationAdjustedSunset(), -13.5 * MINUTE_MILLIS);
+		return getTimeOffset(getElevationAdjustedSunset(), (long) (-13.5 * MINUTE_MILLIS));
 	}
 	
 	/**
@@ -2845,7 +2845,7 @@ public class ComplexZmanimCalendar extends ZmanimCalendar {
 	 * @see #setAteretTorahSunsetOffset(double)
 	 */
 	public Date getTzaisAteretTorah() {
-		return getTimeOffset(getElevationAdjustedSunset(), getAteretTorahSunsetOffset() * MINUTE_MILLIS);
+		return getTimeOffset(getElevationAdjustedSunset(), (long) (getAteretTorahSunsetOffset() * MINUTE_MILLIS));
 	}
 
 	/**
