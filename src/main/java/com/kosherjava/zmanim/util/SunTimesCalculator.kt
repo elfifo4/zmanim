@@ -13,265 +13,263 @@
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA,
  * or connect to: https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
  */
-package com.kosherjava.zmanim.util;
+package com.kosherjava.zmanim.util
 
-import java.util.Calendar;
+import java.util.Calendar
 
 /**
  * Implementation of sunrise and sunset methods to calculate astronomical times. This calculator uses the Java algorithm
- * written by <a href="htts://web.archive.org/web/20090531215353/http://www.kevinboone.com/suntimes.html">Kevin
- * Boone</a> that is based on the <a href = "https://aa.usno.navy.mil/">US Naval Observatory's</a><a
- * href="https://aa.usno.navy.mil/publications/asa">Astronomical Almanac</a> and used with his permission. Added to Kevin's
+ * written by [Kevin
+ * Boone](htts://web.archive.org/web/20090531215353/http://www.kevinboone.com/suntimes.html) that is based on the [US Naval Observatory's](https://aa.usno.navy.mil/)[Astronomical Almanac](https://aa.usno.navy.mil/publications/asa) and used with his permission. Added to Kevin's
  * code is adjustment of the zenith to account for elevation. This algorithm returns the same time every year and does not
- * account for leap years. It is not as accurate as the Jean Meeus based {@link NOAACalculator} that is the default calculator
- * use by the KosherJava <em>zmanim</em> library.
- * 
- * @author &copy; Eliyahu Hershfeld 2004 - 2023
- * @author &copy; Kevin Boone 2000
+ * account for leap years. It is not as accurate as the Jean Meeus based [NOAACalculator] that is the default calculator
+ * use by the KosherJava *zmanim* library.
+ *
+ * @author  Eliyahu Hershfeld 2004 - 2023
+ * @author  Kevin Boone 2000
  */
-public class SunTimesCalculator extends AstronomicalCalculator {
+class SunTimesCalculator : AstronomicalCalculator() {
+    /**
+     * @see com.kosherjava.zmanim.util.AstronomicalCalculator.getCalculatorName
+     */
+    override fun getCalculatorName(): String {
+        return "US Naval Almanac Algorithm"
+    }
 
-	/**
-	 * @see com.kosherjava.zmanim.util.AstronomicalCalculator#getCalculatorName()
-	 */
-	public String getCalculatorName() {
-		return "US Naval Almanac Algorithm";
-	}
+    /**
+     * @see com.kosherjava.zmanim.util.AstronomicalCalculator.getUTCSunrise
+     */
+    override fun getUTCSunrise(calendar: Calendar, geoLocation: GeoLocation, zenith: Double, adjustForElevation: Boolean): Double {
+        var doubleTime = Double.NaN
+        val elevation: Double = if (adjustForElevation) geoLocation.elevation else 0.0
+        val adjustedZenith = adjustZenith(zenith, elevation)
+        doubleTime = getTimeUTC(calendar, geoLocation, adjustedZenith, true)
+        return doubleTime
+    }
 
-	/**
-	 * @see com.kosherjava.zmanim.util.AstronomicalCalculator#getUTCSunrise(Calendar, GeoLocation, double, boolean)
-	 */
-	public double getUTCSunrise(Calendar calendar, GeoLocation geoLocation, double zenith, boolean adjustForElevation) {
-		double doubleTime = Double.NaN;
-		double elevation = adjustForElevation ? geoLocation.getElevation() : 0;
-		double adjustedZenith = adjustZenith(zenith, elevation);
-		doubleTime = getTimeUTC(calendar, geoLocation, adjustedZenith, true);
-		return doubleTime;
-	}
+    /**
+     * @see com.kosherjava.zmanim.util.AstronomicalCalculator.getUTCSunset
+     */
+    override fun getUTCSunset(calendar: Calendar, geoLocation: GeoLocation, zenith: Double, adjustForElevation: Boolean): Double {
+        var doubleTime = Double.NaN
+        val elevation: Double = if (adjustForElevation) geoLocation.elevation else 0.0
+        val adjustedZenith = adjustZenith(zenith, elevation)
+        doubleTime = getTimeUTC(calendar, geoLocation, adjustedZenith, false)
+        return doubleTime
+    }
 
-	/**
-	 * @see com.kosherjava.zmanim.util.AstronomicalCalculator#getUTCSunset(Calendar, GeoLocation, double, boolean)
-	 */
-	public double getUTCSunset(Calendar calendar, GeoLocation geoLocation, double zenith, boolean adjustForElevation) {
-		double doubleTime = Double.NaN;
-		double elevation = adjustForElevation ? geoLocation.getElevation() : 0;
-		double adjustedZenith = adjustZenith(zenith, elevation);
-		doubleTime = getTimeUTC(calendar, geoLocation, adjustedZenith, false);
-		return doubleTime;
-	}
+    /**
+     * Return the [Universal Coordinated Time](https://en.wikipedia.org/wiki/Universal_Coordinated_Time) (UTC)
+     * of [solar noon](https://en.wikipedia.org/wiki/Noon#Solar_noon) for the given day at the given location
+     * on earth. This implementation returns solar noon as the time halfway between sunrise and sunset.
+     * Other calculators may return true solar noon. See [The Definition of Chatzos](https://kosherjava.com/2020/07/02/definition-of-chatzos/) for details on solar
+     * noon calculations.
+     * @see com.kosherjava.zmanim.util.AstronomicalCalculator.getUTCNoon
+     * @see NOAACalculator
+     *
+     *
+     * @param calendar
+     * The Calendar representing the date to calculate solar noon for
+     * @param geoLocation
+     * The location information used for astronomical calculating sun times.
+     * @return the time in minutes from zero UTC
+     */
+    override fun getUTCNoon(calendar: Calendar, geoLocation: GeoLocation): Double {
+        val sunrise = getUTCSunrise(calendar, geoLocation, 90.0, true)
+        val sunset = getUTCSunset(calendar, geoLocation, 90.0, true)
+        return sunrise + (sunset - sunrise) / 2
+    }
 
-	/**
-	 * The number of degrees of longitude that corresponds to one hour time difference.
-	 */
-	private static final double DEG_PER_HOUR = 360.0 / 24.0;
+    companion object {
+        /**
+         * The number of degrees of longitude that corresponds to one hour time difference.
+         */
+        private const val DEG_PER_HOUR = 360.0 / 24.0
 
-	/**
-	 * @param deg the degrees
-	 * @return sin of the angle in degrees
-	 */
-	private static double sinDeg(double deg) {
-		return Math.sin(deg * 2.0 * Math.PI / 360.0);
-	}
+        /**
+         * @param deg the degrees
+         * @return sin of the angle in degrees
+         */
+        private fun sinDeg(deg: Double): Double {
+            return Math.sin(deg * 2.0 * Math.PI / 360.0)
+        }
 
-	/**
-	 * @param x angle
-	 * @return acos of the angle in degrees
-	 */
-	private static double acosDeg(double x) {
-		return Math.acos(x) * 360.0 / (2 * Math.PI);
-	}
+        /**
+         * @param x angle
+         * @return acos of the angle in degrees
+         */
+        private fun acosDeg(x: Double): Double {
+            return Math.acos(x) * 360.0 / (2 * Math.PI)
+        }
 
-	/**
-	 * @param x angle
-	 * @return asin of the angle in degrees
-	 */
-	private static double asinDeg(double x) {
-		return Math.asin(x) * 360.0 / (2 * Math.PI);
-	}
+        /**
+         * @param x angle
+         * @return asin of the angle in degrees
+         */
+        private fun asinDeg(x: Double): Double {
+            return Math.asin(x) * 360.0 / (2 * Math.PI)
+        }
 
-	/**
-	 * @param deg degrees
-	 * @return tan of the angle in degrees
-	 */
-	private static double tanDeg(double deg) {
-		return Math.tan(deg * 2.0 * Math.PI / 360.0);
-	}
-	
-	/**
-	 * Calculate cosine of the angle in degrees
-	 * 
-	 * @param deg degrees
-	 * @return cosine of the angle in degrees
-	 */
-	private static double cosDeg(double deg) {
-		return Math.cos(deg * 2.0 * Math.PI / 360.0);
-	}
+        /**
+         * @param deg degrees
+         * @return tan of the angle in degrees
+         */
+        private fun tanDeg(deg: Double): Double {
+            return Math.tan(deg * 2.0 * Math.PI / 360.0)
+        }
 
-	/**
-	 * Get time difference between location's longitude and the Meridian, in hours.
-	 * 
-	 * @param longitude the longitude
-	 * @return time difference between the location's longitude and the Meridian, in hours. West of Meridian has a negative time difference
-	 */
-	private static double getHoursFromMeridian(double longitude) {
-		return longitude / DEG_PER_HOUR;
-	}
-	
-	/**
-	 * Calculate the approximate time of sunset or sunrise in days since midnight Jan 1st, assuming 6am and 6pm events. We
-	 * need this figure to derive the Sun's mean anomaly.
-	 * 
-	 * @param dayOfYear the day of year
-	 * @param hoursFromMeridian hours from the meridian
-	 * @param isSunrise true for sunrise and false for sunset
-	 * 
-	 * @return the approximate time of sunset or sunrise in days since midnight Jan 1st, assuming 6am and 6pm events. We
-	 * need this figure to derive the Sun's mean anomaly.
-	 */
-	private static double getApproxTimeDays(int dayOfYear, double hoursFromMeridian, boolean isSunrise) {
-		if (isSunrise) {
-			return dayOfYear + ((6.0 - hoursFromMeridian) / 24);
-		} else { // sunset
-			return dayOfYear + ((18.0 - hoursFromMeridian) / 24);
-		}
-	}
-	
-	/**
-	 * Calculate the Sun's mean anomaly in degrees, at sunrise or sunset, given the longitude in degrees
-	 * 
-	 * @param dayOfYear the day of the year
-	 * @param longitude longitude
-	 * @param isSunrise true for sunrise and false for sunset
-	 * @return the Sun's mean anomaly in degrees
-	 */
-	private static double getMeanAnomaly(int dayOfYear, double longitude, boolean isSunrise) {
-		return (0.9856 * getApproxTimeDays(dayOfYear, getHoursFromMeridian(longitude), isSunrise)) - 3.289;
-	}
+        /**
+         * Calculate cosine of the angle in degrees
+         *
+         * @param deg degrees
+         * @return cosine of the angle in degrees
+         */
+        private fun cosDeg(deg: Double): Double {
+            return Math.cos(deg * 2.0 * Math.PI / 360.0)
+        }
 
-	/**
-	 * @param sunMeanAnomaly the Sun's mean anomaly in degrees
-	 * @return the Sun's true longitude in degrees. The result is an angle &gt;= 0 and &lt;= 360.
-	 */
-	private static double getSunTrueLongitude(double sunMeanAnomaly) {
-		double l = sunMeanAnomaly + (1.916 * sinDeg(sunMeanAnomaly)) + (0.020 * sinDeg(2 * sunMeanAnomaly)) + 282.634;
+        /**
+         * Get time difference between location's longitude and the Meridian, in hours.
+         *
+         * @param longitude the longitude
+         * @return time difference between the location's longitude and the Meridian, in hours. West of Meridian has a negative time difference
+         */
+        private fun getHoursFromMeridian(longitude: Double): Double {
+            return longitude / DEG_PER_HOUR
+        }
 
-		// get longitude into 0-360 degree range
-		if (l >= 360.0) {
-			l = l - 360.0;
-		}
-		if (l < 0) {
-			l = l + 360.0;
-		}
-		return l;
-	}
+        /**
+         * Calculate the approximate time of sunset or sunrise in days since midnight Jan 1st, assuming 6am and 6pm events. We
+         * need this figure to derive the Sun's mean anomaly.
+         *
+         * @param dayOfYear the day of year
+         * @param hoursFromMeridian hours from the meridian
+         * @param isSunrise true for sunrise and false for sunset
+         *
+         * @return the approximate time of sunset or sunrise in days since midnight Jan 1st, assuming 6am and 6pm events. We
+         * need this figure to derive the Sun's mean anomaly.
+         */
+        private fun getApproxTimeDays(dayOfYear: Int, hoursFromMeridian: Double, isSunrise: Boolean): Double {
+            return if (isSunrise) {
+                dayOfYear + (6.0 - hoursFromMeridian) / 24
+            } else { // sunset
+                dayOfYear + (18.0 - hoursFromMeridian) / 24
+            }
+        }
 
-	/**
-	 * Calculates the Sun's right ascension in hours.
-	 * @param sunTrueLongitude the Sun's true longitude in degrees &gt; 0 and &lt; 360.
-	 * @return the Sun's right ascension in hours in angles &gt; 0 and &lt; 360.
-	 */
-	private static double getSunRightAscensionHours(double sunTrueLongitude) {
-		double a = 0.91764 * tanDeg(sunTrueLongitude);
-		double ra = 360.0 / (2.0 * Math.PI) * Math.atan(a);
+        /**
+         * Calculate the Sun's mean anomaly in degrees, at sunrise or sunset, given the longitude in degrees
+         *
+         * @param dayOfYear the day of the year
+         * @param longitude longitude
+         * @param isSunrise true for sunrise and false for sunset
+         * @return the Sun's mean anomaly in degrees
+         */
+        private fun getMeanAnomaly(dayOfYear: Int, longitude: Double, isSunrise: Boolean): Double {
+            return 0.9856 * getApproxTimeDays(dayOfYear, getHoursFromMeridian(longitude), isSunrise) - 3.289
+        }
 
-		double lQuadrant = Math.floor(sunTrueLongitude / 90.0) * 90.0;
-		double raQuadrant = Math.floor(ra / 90.0) * 90.0;
-		ra = ra + (lQuadrant - raQuadrant);
+        /**
+         * @param sunMeanAnomaly the Sun's mean anomaly in degrees
+         * @return the Sun's true longitude in degrees. The result is an angle &gt;= 0 and &lt;= 360.
+         */
+        private fun getSunTrueLongitude(sunMeanAnomaly: Double): Double {
+            var l = sunMeanAnomaly + 1.916 * sinDeg(sunMeanAnomaly) + 0.020 * sinDeg(2 * sunMeanAnomaly) + 282.634
 
-		return ra / DEG_PER_HOUR; // convert to hours
-	}
+            // get longitude into 0-360 degree range
+            if (l >= 360.0) {
+                l = l - 360.0
+            }
+            if (l < 0) {
+                l = l + 360.0
+            }
+            return l
+        }
 
-	/**
-	 * Calculate the cosine of the Sun's local hour angle
-	 * 
-	 * @param sunTrueLongitude the sun's true longitude
-	 * @param latitude the latitude
-	 * @param zenith the zenith
-	 * @return the cosine of the Sun's local hour angle
-	 */
-	private static double getCosLocalHourAngle(double sunTrueLongitude, double latitude, double zenith) {
-		double sinDec = 0.39782 * sinDeg(sunTrueLongitude);
-		double cosDec = cosDeg(asinDeg(sinDec));
-		return (cosDeg(zenith) - (sinDec * sinDeg(latitude))) / (cosDec * cosDeg(latitude));
-	}
-	
-	/**
-	 * Calculate local mean time of rising or setting. By 'local' is meant the exact time at the location, assuming that
-	 * there were no time zone. That is, the time difference between the location and the Meridian depended entirely on
-	 * the longitude. We can't do anything with this time directly; we must convert it to UTC and then to a local time.
-	 * 
-	 * @param localHour the local hour
-	 * @param sunRightAscensionHours the sun's right ascention in hours
-	 * @param approxTimeDays approximate time days
-	 * 
-	 * @return the fractional number of hours since midnight as a double
-	 */
-	private static double getLocalMeanTime(double localHour, double sunRightAscensionHours, double approxTimeDays) {
-		return localHour + sunRightAscensionHours - (0.06571 * approxTimeDays) - 6.622;
-	}
+        /**
+         * Calculates the Sun's right ascension in hours.
+         * @param sunTrueLongitude the Sun's true longitude in degrees &gt; 0 and &lt; 360.
+         * @return the Sun's right ascension in hours in angles &gt; 0 and &lt; 360.
+         */
+        private fun getSunRightAscensionHours(sunTrueLongitude: Double): Double {
+            val a = 0.91764 * tanDeg(sunTrueLongitude)
+            var ra = 360.0 / (2.0 * Math.PI) * Math.atan(a)
+            val lQuadrant = Math.floor(sunTrueLongitude / 90.0) * 90.0
+            val raQuadrant = Math.floor(ra / 90.0) * 90.0
+            ra = ra + (lQuadrant - raQuadrant)
+            return ra / DEG_PER_HOUR // convert to hours
+        }
 
-	/**
-	 * Get sunrise or sunset time in UTC, according to flag. This time is returned as
-	 * a double and is not adjusted for time-zone.
-	 * 
-	 * @param calendar
-	 *            the Calendar object to extract the day of year for calculation
-	 * @param geoLocation
-	 *            the GeoLocation object that contains the latitude and longitude
-	 * @param zenith
-	 *            Sun's zenith, in degrees
-	 * @param isSunrise
-	 *            True for sunrise and false for sunset.
-	 * @return the time as a double. If an error was encountered in the calculation
-	 *         (expected behavior for some locations such as near the poles,
-	 *         {@link Double#NaN} will be returned.
-	 */
-	private static double getTimeUTC(Calendar calendar, GeoLocation geoLocation, double zenith, boolean isSunrise) {
-		int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-		double sunMeanAnomaly = getMeanAnomaly(dayOfYear, geoLocation.getLongitude(), isSunrise);
-		double sunTrueLong = getSunTrueLongitude(sunMeanAnomaly);
-		double sunRightAscensionHours = getSunRightAscensionHours(sunTrueLong);
-		double cosLocalHourAngle = getCosLocalHourAngle(sunTrueLong, geoLocation.getLatitude(), zenith);
+        /**
+         * Calculate the cosine of the Sun's local hour angle
+         *
+         * @param sunTrueLongitude the sun's true longitude
+         * @param latitude the latitude
+         * @param zenith the zenith
+         * @return the cosine of the Sun's local hour angle
+         */
+        private fun getCosLocalHourAngle(sunTrueLongitude: Double, latitude: Double, zenith: Double): Double {
+            val sinDec = 0.39782 * sinDeg(sunTrueLongitude)
+            val cosDec = cosDeg(asinDeg(sinDec))
+            return cosDeg(zenith) - sinDec * sinDeg(latitude) / (cosDec * cosDeg(latitude))
+        }
 
-		double localHourAngle = 0;
-		if (isSunrise) {
-			localHourAngle = 360.0 - acosDeg(cosLocalHourAngle);
-		} else { // sunset
-			localHourAngle = acosDeg(cosLocalHourAngle);
-		}
-		double localHour = localHourAngle / DEG_PER_HOUR;
+        /**
+         * Calculate local mean time of rising or setting. By 'local' is meant the exact time at the location, assuming that
+         * there were no time zone. That is, the time difference between the location and the Meridian depended entirely on
+         * the longitude. We can't do anything with this time directly; we must convert it to UTC and then to a local time.
+         *
+         * @param localHour the local hour
+         * @param sunRightAscensionHours the sun's right ascention in hours
+         * @param approxTimeDays approximate time days
+         *
+         * @return the fractional number of hours since midnight as a double
+         */
+        private fun getLocalMeanTime(localHour: Double, sunRightAscensionHours: Double, approxTimeDays: Double): Double {
+            return localHour + sunRightAscensionHours - 0.06571 * approxTimeDays - 6.622
+        }
 
-		double localMeanTime = getLocalMeanTime(localHour, sunRightAscensionHours,
-				getApproxTimeDays(dayOfYear, getHoursFromMeridian(geoLocation.getLongitude()), isSunrise));
-		double pocessedTime = localMeanTime - getHoursFromMeridian(geoLocation.getLongitude());
-		while (pocessedTime < 0.0) {
-			pocessedTime += 24.0;
-		}
-		while (pocessedTime >= 24.0) {
-			pocessedTime -= 24.0;
-		}
-		return pocessedTime;
-	}
-	
-	/**
-	 * Return the <a href="https://en.wikipedia.org/wiki/Universal_Coordinated_Time">Universal Coordinated Time</a> (UTC)
-	 * of <a href="https://en.wikipedia.org/wiki/Noon#Solar_noon">solar noon</a> for the given day at the given location
-	 * on earth. This implementation returns solar noon as the time halfway between sunrise and sunset.
-	 * Other calculators may return true solar noon. See <a href=
-	 * "https://kosherjava.com/2020/07/02/definition-of-chatzos/">The Definition of Chatzos</a> for details on solar
-	 * noon calculations.
-	 * @see com.kosherjava.zmanim.util.AstronomicalCalculator#getUTCNoon(Calendar, GeoLocation)
-	 * @see NOAACalculator
-	 * 
-	 * @param calendar
-	 *            The Calendar representing the date to calculate solar noon for
-	 * @param geoLocation
-	 *            The location information used for astronomical calculating sun times.
-	 * @return the time in minutes from zero UTC
-	 */
-	public double getUTCNoon(Calendar calendar, GeoLocation geoLocation) {
-		double sunrise = getUTCSunrise(calendar, geoLocation, 90, true);
-		double sunset = getUTCSunset(calendar, geoLocation, 90, true);
-		return (sunrise + ((sunset - sunrise) / 2));
-	}
+        /**
+         * Get sunrise or sunset time in UTC, according to flag. This time is returned as
+         * a double and is not adjusted for time-zone.
+         *
+         * @param calendar
+         * the Calendar object to extract the day of year for calculation
+         * @param geoLocation
+         * the GeoLocation object that contains the latitude and longitude
+         * @param zenith
+         * Sun's zenith, in degrees
+         * @param isSunrise
+         * True for sunrise and false for sunset.
+         * @return the time as a double. If an error was encountered in the calculation
+         * (expected behavior for some locations such as near the poles,
+         * [Double.NaN] will be returned.
+         */
+        private fun getTimeUTC(calendar: Calendar, geoLocation: GeoLocation, zenith: Double, isSunrise: Boolean): Double {
+            val dayOfYear = calendar[Calendar.DAY_OF_YEAR]
+            val sunMeanAnomaly = getMeanAnomaly(dayOfYear, geoLocation.longitude, isSunrise)
+            val sunTrueLong = getSunTrueLongitude(sunMeanAnomaly)
+            val sunRightAscensionHours = getSunRightAscensionHours(sunTrueLong)
+            val cosLocalHourAngle = getCosLocalHourAngle(sunTrueLong, geoLocation.latitude, zenith)
+            var localHourAngle = 0.0
+            localHourAngle = if (isSunrise) {
+                360.0 - acosDeg(cosLocalHourAngle)
+            } else { // sunset
+                acosDeg(cosLocalHourAngle)
+            }
+            val localHour = localHourAngle / DEG_PER_HOUR
+            val localMeanTime = getLocalMeanTime(
+                localHour, sunRightAscensionHours,
+                getApproxTimeDays(dayOfYear, getHoursFromMeridian(geoLocation.longitude), isSunrise)
+            )
+            var pocessedTime = localMeanTime - getHoursFromMeridian(geoLocation.longitude)
+            while (pocessedTime < 0.0) {
+                pocessedTime += 24.0
+            }
+            while (pocessedTime >= 24.0) {
+                pocessedTime -= 24.0
+            }
+            return pocessedTime
+        }
+    }
 }
