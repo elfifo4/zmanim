@@ -117,8 +117,8 @@ object YerushalmiYomiCalculator {
     private fun getNumOfSpecialDays(start: Calendar, end: Calendar): Int {
 
         // Find the start and end Jewish years
-        val startYear = JewishCalendar(start).jewishYear
-        val endYear = JewishCalendar(end).jewishYear
+        val startYear = JewishCalendar(start).getJewishYear()
+        val endYear = JewishCalendar(end).getJewishYear()
 
         // Value to return
         var specialDays = 0
@@ -129,8 +129,8 @@ object YerushalmiYomiCalculator {
 
         // Go over the years and find special dates
         for (i in startYear..endYear) {
-            yom_kippur.jewishYear = i
-            tisha_beav.jewishYear = i
+            yom_kippur.setJewishYear(i)
+            tisha_beav.setJewishYear(i)
             if (isBetween(start, yom_kippur.gregorianCalendar, end)) {
                 specialDays++
             }

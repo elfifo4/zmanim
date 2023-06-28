@@ -446,7 +446,7 @@ class HebrewDateFormatter {
             return ""
         }
         var formattedRoshChodesh = ""
-        var month = jewishCalendar.jewishMonth
+        var month = jewishCalendar.getJewishMonth()
         if (jewishCalendar.jewishDayOfMonth == 30) {
             if (month < JewishDate.ADAR || month == JewishDate.ADAR && jewishCalendar.isJewishLeapYear) {
                 month++
@@ -457,7 +457,7 @@ class HebrewDateFormatter {
 
         // This method is only about formatting, so we shouldn't make any changes to the params passed in...
         jewishCalendar = jewishCalendar.clone() as JewishCalendar
-        jewishCalendar.jewishMonth = month
+        jewishCalendar.setJewishMonth(month)
         formattedRoshChodesh =
             if (isHebrewFormat) hebrewHolidays[JewishCalendar.ROSH_CHODESH] else transliteratedHolidayList[JewishCalendar.ROSH_CHODESH]
         formattedRoshChodesh += " " + formatMonth(jewishCalendar)
