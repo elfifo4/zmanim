@@ -13,189 +13,142 @@
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA,
  * or connect to: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
  */
-package com.kosherjava.zmanim.util;
+package com.kosherjava.zmanim.util
 
-import java.util.TimeZone;
+import java.util.TimeZone
 
 /**
- * A class that represents a numeric time. Times that represent a time of day are stored as {@link java.util.Date}s in
+ * A class that represents a numeric time. Times that represent a time of day are stored as [java.util.Date]s in
  * this API. The time class is used to represent numeric time such as the time in hours, minutes, seconds and
- * milliseconds of a {@link com.kosherjava.zmanim.AstronomicalCalendar#getTemporalHour() temporal hour}.
- * 
- * @author &copy; Eliyahu Hershfeld 2004 - 2020
+ * milliseconds of a [temporal hour][com.kosherjava.zmanim.AstronomicalCalendar.getTemporalHour].
+ *
+ * @author  Eliyahu Hershfeld 2004 - 2020
  */
-public class Time {
-	/** milliseconds in a second. */
-	private static final int SECOND_MILLIS = 1000;
+class Time {
 
-	/** milliseconds in a minute. */
-	private static final int MINUTE_MILLIS = SECOND_MILLIS * 60;
+    /**
+     * @return Returns the hour.
+     */
+    /**
+     * @param hours
+     * The hours to set.
+     */
+    /**
+     * @see .getHours
+     */
+    var hours = 0
+    /**
+     * @return Returns the minutes.
+     */
+    /**
+     * @param minutes
+     * The minutes to set.
+     */
+    /**
+     * @see .getMinutes
+     */
+    var minutes = 0
+    /**
+     * @return Returns the seconds.
+     */
+    /**
+     * @param seconds
+     * The seconds to set.
+     */
+    /**
+     * @see .getSeconds
+     */
+    var seconds = 0
+    /**
+     * @return Returns the milliseconds.
+     */
+    /**
+     * @param milliseconds
+     * The milliseconds to set.
+     */
+    /**
+     * @see .getMilliseconds
+     */
+    var milliseconds = 0
+    /**
+     * Does the time represent a negative time 9such as using this to subtract time from another Time.
+     * @return if the time is negative.
+     */
+    /**
+     * Set this to represent a negative time.
+     * @param isNegative that the Time represents negative time
+     */
+    /**
+     * @see .isNegative
+     * @see .setIsNegative
+     */
+    var isNegative = false
 
-	/** milliseconds in an hour. */
-	private static final int HOUR_MILLIS = MINUTE_MILLIS * 60;
+    /**
+     * Constructor with parameters for the hours, minutes, seconds and millisecods.
+     *
+     * @param hours the hours to set
+     * @param minutes the minutes to set
+     * @param seconds the seconds to set
+     * @param milliseconds the milliseconds to set
+     */
+    constructor(hours: Int, minutes: Int, seconds: Int, milliseconds: Int) {
+        this.hours = hours
+        this.minutes = minutes
+        this.seconds = seconds
+        this.milliseconds = milliseconds
+    }
 
-	/**
-	 * @see #getHours()
-	 */
-	private int hours = 0;
+    /**
+     * Constructor with a parameter for milliseconds. This constructor casts the milliseconds to an int and
+     * calls [.Time]
+     * @param millis the milliseconds to set the object with.
+     */
+    constructor(millis: Double) : this(millis.toInt()) {}
 
-	/**
-	 * @see #getMinutes()
-	 */
-	private int minutes = 0;
+    /**
+     * A constructor that sets the time by milliseconds. The milliseconds are converted to hours, minutes, seconds
+     * and milliseconds. If the milliseconds are negative it will call [.setIsNegative].
+     * @param millis the milliseconds to set.
+     */
+    constructor(millis: Int) {
+        var adjustedMillis = millis
+        if (adjustedMillis < 0) {
+            isNegative = true
+            adjustedMillis = Math.abs(adjustedMillis)
+        }
+        hours = adjustedMillis / HOUR_MILLIS
+        adjustedMillis = adjustedMillis - hours * HOUR_MILLIS
+        minutes = adjustedMillis / MINUTE_MILLIS
+        adjustedMillis = adjustedMillis - minutes * MINUTE_MILLIS
+        seconds = adjustedMillis / SECOND_MILLIS
+        adjustedMillis = adjustedMillis - seconds * SECOND_MILLIS
+        milliseconds = adjustedMillis
+    }
 
-	/**
-	 * @see #getSeconds()
-	 */
-	private int seconds = 0;
+    /**
+     * Returns the time in milliseconds by converting hours, minutes and seconds into milliseconds.
+     * @return the time in milliseconds
+     */
+    val time: Double
+        get() = (hours * HOUR_MILLIS + minutes * MINUTE_MILLIS + seconds * SECOND_MILLIS + milliseconds).toDouble()
 
-	/**
-	 * @see #getMilliseconds()
-	 */
-	private int milliseconds = 0;
+    /**
+     * @see java.lang.Object.toString
+     */
+    override fun toString(): String {
+        return ZmanimFormatter(TimeZone.getTimeZone("UTC")).format(this)
+    }
 
-	/**
-	 * @see #isNegative()
-	 * @see #setIsNegative(boolean)
-	 */
-	private boolean isNegative = false;
+    companion object {
+        /** milliseconds in a second.  */
+        private const val SECOND_MILLIS = 1000
 
-	/**
-	 * Constructor with parameters for the hours, minutes, seconds and millisecods.
-	 * 
-	 * @param hours the hours to set
-	 * @param minutes the minutes to set
-	 * @param seconds the seconds to set
-	 * @param milliseconds the milliseconds to set
-	 */
-	public Time(int hours, int minutes, int seconds, int milliseconds) {
-		this.hours = hours;
-		this.minutes = minutes;
-		this.seconds = seconds;
-		this.milliseconds = milliseconds;
-	}
+        /** milliseconds in a minute.  */
+        private const val MINUTE_MILLIS = SECOND_MILLIS * 60
 
-	/**
-	 * Constructor with a parameter for milliseconds. This constructor casts the milliseconds to an int and
-	 * calls {@link #Time(int)}
-	 * @param millis the milliseconds to set the object with.
-	 */
-	public Time(double millis) {
-		this((int) millis);
-	}
+        /** milliseconds in an hour.  */
+        private const val HOUR_MILLIS = MINUTE_MILLIS * 60
+    }
 
-	/**
-	 * A constructor that sets the time by milliseconds. The milliseconds are converted to hours, minutes, seconds
-	 * and milliseconds. If the milliseconds are negative it will call {@link #setIsNegative(boolean)}.
-	 * @param millis the milliseconds to set.
-	 */
-	public Time(int millis) {
-		int adjustedMillis = millis;
-		if (adjustedMillis < 0) {
-			this.isNegative = true;
-			adjustedMillis = Math.abs(adjustedMillis);
-		}
-		this.hours = adjustedMillis / HOUR_MILLIS;
-		adjustedMillis = adjustedMillis - this.hours * HOUR_MILLIS;
-
-		this.minutes = adjustedMillis / MINUTE_MILLIS;
-		adjustedMillis = adjustedMillis - this.minutes * MINUTE_MILLIS;
-
-		this.seconds = adjustedMillis / SECOND_MILLIS;
-		adjustedMillis = adjustedMillis - this.seconds * SECOND_MILLIS;
-
-		this.milliseconds = adjustedMillis;
-	}
-
-	/**
-	 * Does the time represent a negative time 9such as using this to subtract time from another Time.
-	 * @return if the time is negative.
-	 */
-	public boolean isNegative() {
-		return this.isNegative;
-	}
-
-	/**
-	 * Set this to represent a negative time.
-	 * @param isNegative that the Time represents negative time
-	 */
-	public void setIsNegative(boolean isNegative) {
-		this.isNegative = isNegative;
-	}
-
-	/**
-	 * @return Returns the hour.
-	 */
-	public int getHours() {
-		return this.hours;
-	}
-
-	/**
-	 * @param hours
-	 *            The hours to set.
-	 */
-	public void setHours(int hours) {
-		this.hours = hours;
-	}
-
-	/**
-	 * @return Returns the minutes.
-	 */
-	public int getMinutes() {
-		return this.minutes;
-	}
-
-	/**
-	 * @param minutes
-	 *            The minutes to set.
-	 */
-	public void setMinutes(int minutes) {
-		this.minutes = minutes;
-	}
-
-	/**
-	 * @return Returns the seconds.
-	 */
-	public int getSeconds() {
-		return this.seconds;
-	}
-
-	/**
-	 * @param seconds
-	 *            The seconds to set.
-	 */
-	public void setSeconds(int seconds) {
-		this.seconds = seconds;
-	}
-
-	/**
-	 * @return Returns the milliseconds.
-	 */
-	public int getMilliseconds() {
-		return this.milliseconds;
-	}
-
-	/**
-	 * @param milliseconds
-	 *            The milliseconds to set.
-	 */
-	public void setMilliseconds(int milliseconds) {
-		this.milliseconds = milliseconds;
-	}
-
-	/**
-	 * Returns the time in milliseconds by converting hours, minutes and seconds into milliseconds.
-	 * @return the time in milliseconds
-	 */
-	public double getTime() {
-		return this.hours * HOUR_MILLIS + this.minutes * MINUTE_MILLIS + this.seconds * SECOND_MILLIS
-				+ this.milliseconds;
-	}
-
-	/**
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
-		return new ZmanimFormatter(TimeZone.getTimeZone("UTC")).format(this);
-	}
 }
