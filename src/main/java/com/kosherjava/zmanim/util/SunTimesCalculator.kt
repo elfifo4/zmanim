@@ -41,7 +41,7 @@ class SunTimesCalculator : AstronomicalCalculator() {
      */
     override fun getUTCSunrise(calendar: Calendar, geoLocation: GeoLocation, zenith: Double, adjustForElevation: Boolean): Double {
         var doubleTime = Double.NaN
-        val elevation: Double = if (adjustForElevation) geoLocation.elevation else 0.0
+        val elevation: Double = if (adjustForElevation) geoLocation.getElevation() else 0.0
         val adjustedZenith = adjustZenith(zenith, elevation)
         doubleTime = getTimeUTC(calendar, geoLocation, adjustedZenith, true)
         return doubleTime
@@ -52,7 +52,7 @@ class SunTimesCalculator : AstronomicalCalculator() {
      */
     override fun getUTCSunset(calendar: Calendar, geoLocation: GeoLocation, zenith: Double, adjustForElevation: Boolean): Double {
         var doubleTime = Double.NaN
-        val elevation: Double = if (adjustForElevation) geoLocation.elevation else 0.0
+        val elevation: Double = if (adjustForElevation) geoLocation.getElevation() else 0.0
         val adjustedZenith = adjustZenith(zenith, elevation)
         doubleTime = getTimeUTC(calendar, geoLocation, adjustedZenith, false)
         return doubleTime
@@ -247,10 +247,10 @@ class SunTimesCalculator : AstronomicalCalculator() {
          */
         private fun getTimeUTC(calendar: Calendar, geoLocation: GeoLocation, zenith: Double, isSunrise: Boolean): Double {
             val dayOfYear = calendar[Calendar.DAY_OF_YEAR]
-            val sunMeanAnomaly = getMeanAnomaly(dayOfYear, geoLocation.longitude, isSunrise)
+            val sunMeanAnomaly = getMeanAnomaly(dayOfYear, geoLocation.getLongitude(), isSunrise)
             val sunTrueLong = getSunTrueLongitude(sunMeanAnomaly)
             val sunRightAscensionHours = getSunRightAscensionHours(sunTrueLong)
-            val cosLocalHourAngle = getCosLocalHourAngle(sunTrueLong, geoLocation.latitude, zenith)
+            val cosLocalHourAngle = getCosLocalHourAngle(sunTrueLong, geoLocation.getLatitude(), zenith)
             var localHourAngle = 0.0
             localHourAngle = if (isSunrise) {
                 360.0 - acosDeg(cosLocalHourAngle)
@@ -260,9 +260,9 @@ class SunTimesCalculator : AstronomicalCalculator() {
             val localHour = localHourAngle / DEG_PER_HOUR
             val localMeanTime = getLocalMeanTime(
                 localHour, sunRightAscensionHours,
-                getApproxTimeDays(dayOfYear, getHoursFromMeridian(geoLocation.longitude), isSunrise)
+                getApproxTimeDays(dayOfYear, getHoursFromMeridian(geoLocation.getLongitude()), isSunrise)
             )
-            var pocessedTime = localMeanTime - getHoursFromMeridian(geoLocation.longitude)
+            var pocessedTime = localMeanTime - getHoursFromMeridian(geoLocation.getLongitude())
             while (pocessedTime < 0.0) {
                 pocessedTime += 24.0
             }

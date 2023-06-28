@@ -118,9 +118,9 @@ object GeoLocationUtils {
         val a = 6378137.0 // length of semi-major axis of the ellipsoid (radius at equator) in metres based on WGS-84
         val b = 6356752.3142 // length of semi-minor axis of the ellipsoid (radius at the poles) in meters based on WGS-84
         val f = 1 / 298.257223563 // flattening of the ellipsoid based on WGS-84
-        val L = Math.toRadians(destination.longitude - location.longitude) //difference in longitude of two points;
-        val U1 = Math.atan((1 - f) * Math.tan(Math.toRadians(location.latitude))) // reduced latitude (latitude on the auxiliary sphere)
-        val U2 = Math.atan((1 - f) * Math.tan(Math.toRadians(destination.latitude))) // reduced latitude (latitude on the auxiliary sphere)
+        val L = Math.toRadians(destination.getLatitude() - location.getLatitude()) //difference in longitude of two points;
+        val U1 = Math.atan((1 - f) * Math.tan(Math.toRadians(location.getLatitude()))) // reduced latitude (latitude on the auxiliary sphere)
+        val U2 = Math.atan((1 - f) * Math.tan(Math.toRadians(destination.getLatitude()))) // reduced latitude (latitude on the auxiliary sphere)
         val sinU1 = Math.sin(U1)
         val cosU1 = Math.cos(U1)
         val sinU2 = Math.sin(U2)
@@ -213,13 +213,13 @@ object GeoLocationUtils {
      * @return the bearing in degrees
      */
     fun getRhumbLineBearing(location: GeoLocation, destination: GeoLocation): Double {
-        var dLon = Math.toRadians(destination.longitude - location.longitude)
+        var dLon = Math.toRadians(destination.getLatitude() - location.getLatitude())
         val dPhi = Math.log(
             Math.tan(
-                Math.toRadians(destination.latitude)
+                Math.toRadians(destination.getLatitude())
                         / 2 + Math.PI / 4
             )
-                    / Math.tan(Math.toRadians(location.latitude) / 2 + Math.PI / 4)
+                    / Math.tan(Math.toRadians(location.getLatitude()) / 2 + Math.PI / 4)
         )
         if (Math.abs(dLon) > Math.PI) dLon = if (dLon > 0) -(2 * Math.PI - dLon) else 2 * Math.PI + dLon
         return Math.toDegrees(Math.atan2(dLon, dPhi))
@@ -237,15 +237,15 @@ object GeoLocationUtils {
      */
     fun getRhumbLineDistance(location: GeoLocation, destination: GeoLocation): Double {
         val earthRadius = 6378137.0 // Earth's radius in meters (WGS-84)
-        val dLat = Math.toRadians(location.latitude) - Math.toRadians(destination.latitude)
-        var dLon = Math.abs(Math.toRadians(location.longitude) - Math.toRadians(destination.longitude))
+        val dLat = Math.toRadians(location.getLatitude()) - Math.toRadians(destination.getLatitude())
+        var dLon = Math.abs(Math.toRadians(location.getLatitude()) - Math.toRadians(destination.getLatitude()))
         val dPhi = Math.log(
-            Math.tan(Math.toRadians(location.latitude) / 2 + Math.PI / 4)
-                    / Math.tan(Math.toRadians(destination.latitude) / 2 + Math.PI / 4)
+            Math.tan(Math.toRadians(location.getLatitude()) / 2 + Math.PI / 4)
+                    / Math.tan(Math.toRadians(destination.getLatitude()) / 2 + Math.PI / 4)
         )
         var q = dLat / dPhi
         if (Math.abs(q) > Double.MAX_VALUE) {
-            q = Math.cos(Math.toRadians(destination.latitude))
+            q = Math.cos(Math.toRadians(destination.getLatitude()))
         }
         // if dLon over 180° take shorter rhumb across 180° meridian:
         if (dLon > Math.PI) {
