@@ -45,6 +45,7 @@ import java.util.TimeZone;
  * @author &copy; Eliyahu Hershfeld 2011 - 2023
  */
 public class JewishCalendar extends JewishDate {
+
 	/** The 14th day of Nissan, the day before of Pesach (Passover).*/
 	public static final int EREV_PESACH = 0;
 	/** The holiday of Pesach (Passover) on the 15th (and 16th out of Israel) day of Nissan.*/
