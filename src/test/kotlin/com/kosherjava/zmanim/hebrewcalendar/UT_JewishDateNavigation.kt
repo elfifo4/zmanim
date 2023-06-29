@@ -15,9 +15,9 @@ class UT_JewishDateNavigation {
     fun jewishForwardMonthToMonth() {
         val jewishDate = JewishDate()
         jewishDate.setJewishDate(5771, 1, 1)
-        Assert.assertEquals(5, jewishDate.gregorianDayOfMonth.toLong())
-        Assert.assertEquals(3, jewishDate.gregorianMonth.toLong())
-        Assert.assertEquals(2011, jewishDate.gregorianYear.toLong())
+        Assert.assertEquals(5, jewishDate.getGregorianDayOfMonth().toLong())
+        Assert.assertEquals(3, jewishDate.getGregorianMonth().toLong())
+        Assert.assertEquals(2011, jewishDate.getGregorianYear().toLong())
     }
 
     @Test
@@ -26,9 +26,9 @@ class UT_JewishDateNavigation {
         // At one point, this test was failing as the JewishDate class spun through a never-ending loop...
         val jewishDate = JewishDate()
         jewishDate.setJewishDate(5771, 7, 1)
-        Assert.assertEquals(9, jewishDate.gregorianDayOfMonth.toLong())
-        Assert.assertEquals(8, jewishDate.gregorianMonth.toLong())
-        Assert.assertEquals(2010, jewishDate.gregorianYear.toLong())
+        Assert.assertEquals(9, jewishDate.getGregorianDayOfMonth().toLong())
+        Assert.assertEquals(8, jewishDate.getGregorianMonth().toLong())
+        Assert.assertEquals(2010, jewishDate.getGregorianYear().toLong())
     }
 
 } // End of UT_JewishDateNavigation class

@@ -11,7 +11,7 @@ class YomiCalculatorTest {
         val daf = YomiCalculator.getDafYomiBavli(jewishCalendar)
         Assert.assertEquals(5, daf!!.masechtaNumber.toLong())
         Assert.assertEquals(2, daf.daf.toLong())
-        println(hdf.formatDafYomiBavli(jewishCalendar.dafYomiBavli))
+        println(hdf.formatDafYomiBavli(jewishCalendar.dafYomiBavli!!))
     }
 
     @Test
@@ -20,7 +20,7 @@ class YomiCalculatorTest {
         val daf = YomiCalculator.getDafYomiBavli(jewishCalendar)
         Assert.assertEquals(4, daf!!.masechtaNumber.toLong())
         Assert.assertEquals(14, daf.daf.toLong())
-        println(hdf.formatDafYomiBavli(jewishCalendar.dafYomiBavli))
+        println(hdf.formatDafYomiBavli(jewishCalendar.dafYomiBavli!!))
     }
 
     @Test
@@ -29,7 +29,7 @@ class YomiCalculatorTest {
         val daf = YomiCalculator.getDafYomiBavli(jewishCalendar)
         Assert.assertEquals(23, daf!!.masechtaNumber.toLong())
         Assert.assertEquals(47, daf.daf.toLong())
-        println(hdf.formatDafYomiBavli(jewishCalendar.dafYomiBavli))
+        println(hdf.formatDafYomiBavli(jewishCalendar.dafYomiBavli!!))
     }
 
     companion object {
